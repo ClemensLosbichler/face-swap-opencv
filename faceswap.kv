@@ -1,0 +1,139 @@
+#:kivy 1.0
+#:import Factory kivy.factory.Factory
+
+<FaceSwap>:
+    refresh: options_dropdown.__self__
+    BoxLayout:
+        padding: 0
+        spacing: 0
+        orientation: 'vertical'
+        canvas:
+            Color:
+                rgba: 1,1,1,1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        BoxLayout:
+			size_hint: (1,0.628)
+            orientation: 'horizontal'
+			size: self.width, self.height
+            rows: 2
+            cols: 2
+            padding: 0
+            spacing: 0
+            size_hint: (1, .628)
+            Button:
+                on_press: root.open_file_chooser()
+                background_color: 1, 1, 1, 0
+                Image:
+                    id: source_image
+                    size: root.width / 2, root.height / 2
+                    center_x: self.parent.center_x
+                    center_y: self.parent.center_y
+                    source: 'images/file-chooser-text.png'
+            Button:
+                id: swapped_image_button
+                # on_press: root.toogle_camera_fullscreen(root)
+                background_color: 1, 1, 1, 0
+                Image:
+                    id: swapped_image
+                    size: root.width / 2, root.height / 2
+                    center_x: self.parent.center_x
+                    center_y: self.parent.center_y
+        RelativeLayout:
+			size_hint: (1,0.327)
+			orientation: 'horizontal'
+            RoundedButton:
+                text: 'Capture'
+				size: (150,40)
+				size_hint: None,None
+				pos_hint: {'center_x': .3, 'center_y': .5}
+				on_release: root.capture()
+            RoundedButton:
+                text: 'Options'
+				size: (150,40)
+				size_hint: None,None
+				pos_hint: {'center_x': .7, 'center_y': .5}
+				on_parent: options_dropdown.dismiss()
+                on_release: options_dropdown.open(self)
+        DropDown:
+            id: options_dropdown
+            on_select: btn.text = '{}'.format(args[1])
+            RoundedSpinner:
+                id: webcam_spinner
+                text: 'Webcams'
+                size: (150,40)
+                size_hint: None, None
+                pos_hint: {'center': (.5, .5)}
+                option_cls: Factory.get("RoundedSpinnerOption")
+            RoundedButton:
+                id: flip_camera
+                text: 'Flip Camera (off)'
+				size: (150,40)
+				size_hint: None,None
+                pos_hint: {'center': (.5, .5)}
+				on_parent: options_dropdown.dismiss()
+                on_release: root.change_flip_camera()
+        Label:
+            id: notification
+            size_hint: (1, .1)
+            pos: (0, 0)
+
+<RoundedSpinner@Spinner>:
+    background_color: (0,0,0,0)
+	background_normal: ''
+	canvas.before:
+		Color:
+			rgba: (48/255,84/255,150/255,1)
+		RoundedRectangle:
+			size: self.size
+			pos: self.pos
+			radius: [20]
+
+<RoundedSpinnerOption@SpinnerOption>:
+    background_color: (0,0,0,0)
+	background_normal: ''
+	canvas.before:
+		Color:
+			rgba: (48/255,84/255,150/255,1)
+		RoundedRectangle:
+			size: self.size
+			pos: self.pos
+			radius: [20]
+
+<RoundedButton@Button>:
+	background_color: (0,0,0,0)
+	background_normal: ''
+	canvas.before:
+		Color:
+			rgba: (48/255,84/255,150/255,1)
+		RoundedRectangle:
+			size: self.size
+			pos: self.pos
+			radius: [20]
+		
+<FileChooser>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        BoxLayout:
+            orientation: "horizontal"
+            Image:
+                id: preview_image
+                source: ""
+            FileChooserIconView:
+                id: filechooser
+                show_hidden: False
+                on_selection: root.select_image(filechooser.selection)
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            RoundedButton:
+                text: "Cancel"
+                size: (150, 40)
+                on_release: root.cancel()
+            RoundedButton:
+                text: "Load"
+                size: (150, 40)
+                on_release: root.load(filechooser.path, filechooser.selection)
